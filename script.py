@@ -24,27 +24,17 @@ def getLanguages(username):
         repo_links.append("https://github.com/" + repo["full_name"])
         count += 1
 
-    # for i in repo_links:
-    #     print("DEBUGGING:", i)
-    # print(count)
-
     for link in repo_links:
         res = requests.get(link)
         soup = BeautifulSoup(res.text, 'html.parser')
         project_langs = soup.find_all('span', class_="lang")
         for lang in project_langs:
-            
+            # update dict
+            if lang.string in lang_dict.keys():
+                lang_dict[lang.string] += 1
+            else:
+                lang_dict[lang.string] = 1
+    print(lang_dict)
 
 
-#getLanguages("kshvmdn") # hi keshav
-
-def getProjectLangs(url):
-    langs = []
-    res = requests.get(url)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    x = soup.find_all('span', class_="lang")
-
-    for i in x:
-        print(i.string)
-
-getProjectLangs("https://github.com/MalusGreen/TheRealSurface")
+getLanguages("SakeebHossain")
