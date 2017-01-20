@@ -10,19 +10,25 @@ def getLanguages(username):
     page_num = 1
     count = 0
 
-    # get the html of the page using requests and parse with bs4
-    res = requests.get("https://api.github.com/users/" + username + "/repos")
+    while (True):
+        # get the html of the page using requests and parse with bs4
+        res = requests.get("https://api.github.com/users/" + username + "/repos?per_page=100&page=" + str(page_num))
 
-    # make sure the profile was found by checking if their first repo page exists
-    if (res.status_code != 200):
-        print("ERROR", res.status_code, ": The profile doesn't exist.")
-        return
+        # make sure the profile was found by checking if their first repo page exists
+        if (res.status_code != 200):
+            print("ERROR", res.status_code, ": The profile doesn't exist.")
+            return
 
-    # get the links from the json obtained from the GithubAPI
-    repos_json = json.loads(res.text)
-    for repo in repos_json:
-        repo_links.append("https://github.com/" + repo["full_name"])
-        count += 1
+        if (res.text == "[]"):
+            break
+
+        # get the links from the json obtained from the GithubAPI
+        repos_json = json.loads(res.text)
+        for repo in repos_json:
+            repo_links.append("https://github.com/" + repo["full_name"])
+            count += 1
+
+        page_num += 1
 
     for link in repo_links:
         res = requests.get(link)
@@ -35,6 +41,5 @@ def getLanguages(username):
             else:
                 lang_dict[lang.string] = 1
     print(lang_dict)
-
 
 getLanguages("SakeebHossain")
